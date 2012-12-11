@@ -1,0 +1,20 @@
+{
+    "name": "touristeye/indextank-php",
+    "description": "Indextank PHP SDK",
+    "keywords": ["indextank", "search"],
+    "type": "library",
+    "homepage": "https://github.com/touristeye/indextank-php",
+    "license": "Apache2",
+    "authors": [
+        {
+            "name": "Indextank",
+            "homepage": "https://github.com/flaptor"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.0"
+    },
+    "autoload": {
+        "classmap": ["src"]
+    }
+}
