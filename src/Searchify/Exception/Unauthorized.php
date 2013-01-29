@@ -1,7 +1,10 @@
 <?php
+
+namespace Searchify\Exception;
+
 /**
- * Author:: Diego Buthay (<dbuthay@gmail.com>)
- * Copyright:: Copyright (c) 2011 indextank.com
+ * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
+ * Copyright:: Copyright (c) 2011 Formspring.me
  * License:: Apache License, Version 2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,7 +20,7 @@
  * under the License.
  */
 
-class Indextank_Exception_IndexDoesNotExist extends Indextank_Exception
+class Indextank_Exception_Unauthorized extends Indextank_Exception
 {
 
 }

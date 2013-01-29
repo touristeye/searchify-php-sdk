@@ -1,4 +1,7 @@
 <?php
+
+namespace Searchify;
+
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
  * Copyright:: Copyright (c) 2011 Formspring.me
@@ -17,7 +20,14 @@
  * under the License.
  */
 
-class Indextank_Exception_InvalidQuery extends Indextank_Exception
+class Response
 {
+    public $status = NULL;
+    public $response = NULL;
 
+    function __construct($status, $response)
+    {
+        $this->status = $status;
+        $this->response = $response;
+    }
 }

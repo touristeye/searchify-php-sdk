@@ -1,4 +1,10 @@
 <?php
+
+namespace Searchify;
+
+use Searchify\Index,
+    Searchify\Response;
+
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
  * Copyright:: Copyright (c) 2011 Formspring.me
@@ -17,7 +23,7 @@
  * under the License.
  */
 
-class Indextank_Api
+class Api
 {
     /*
      * Basic client for an account.
@@ -36,7 +42,7 @@ class Indextank_Api
 
     public function get_index($index_name)
     {
-        return new Indextank_Index($this, $index_name);
+        return new Index($this, $index_name);
     }
 
     public function list_indexes()
@@ -74,11 +80,11 @@ class Indextank_Api
     {
         if ($method == "GET" || $method == "DELETE") {
             $args = http_build_query($params);
-            
+
             // remove the php special encoding of parameters
             // see http://www.php.net/manual/en/function.http-build-query.php#78603
             $args = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', $args);
-            
+
             $url .= '?' . $args;
             $args = '';
         } else {
@@ -101,7 +107,7 @@ class Indextank_Api
         curl_close($session);
 
         if (floor($http_code / 100) == 2) {
-            return new Indextank_Response($http_code, $response);
+            return new Response($http_code, $response);
         }
         throw new Indextank_Exception_HttpException($response, $http_code);
     }

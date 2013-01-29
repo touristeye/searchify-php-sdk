@@ -1,7 +1,10 @@
 <?php
+
+namespace Searchify\Exception;
+
 /**
- * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
- * Copyright:: Copyright (c) 2011 Formspring.me
+ * Author:: Diego Buthay (<dbuthay@gmail.com>)
+ * Copyright:: Copyright (c) 2011 indextank.com
  * License:: Apache License, Version 2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,14 +20,7 @@
  * under the License.
  */
 
-class Indextank_Response
+class Indextank_Exception_IndexDoesNotExist extends Indextank_Exception
 {
-    public $status = NULL;
-    public $response = NULL;
 
-    function __construct($status, $response)
-    {
-        $this->status = $status;
-        $this->response = $response;
-    }
 }

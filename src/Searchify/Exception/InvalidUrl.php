@@ -1,4 +1,7 @@
 <?php
+
+namespace Searchify\Exception;
+
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
  * Copyright:: Copyright (c) 2011 Formspring.me
@@ -17,7 +20,7 @@
  * under the License.
  */
 
-class Indextank_Exception_Unauthorized extends Indextank_Exception
+class Indextank_Exception_InvalidUrl extends Indextank_Exception
 {
 
 }

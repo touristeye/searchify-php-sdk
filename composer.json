@@ -1,20 +1,25 @@
 {
-    "name": "touristeye/indextank-php",
-    "description": "Indextank PHP SDK",
-    "keywords": ["indextank", "search"],
+    "name": "searchify/php-sdk",
+    "description": "Searchify PHP SDK",
+    "keywords": ["searchify", "indextank", "search"],
     "type": "library",
-    "homepage": "https://github.com/touristeye/indextank-php",
+    "homepage": "https://github.com/touristeye/searchify-php-sdk",
     "license": "Apache2",
     "authors": [
         {
             "name": "Indextank",
             "homepage": "https://github.com/flaptor"
+        },
+        {
+            "name": "Javier F. Escribano",
+            "homepage": "https://github.com/fesja",
+            "email": "javier@touristeye.com"
         }
     ],
     "require": {
         "php": ">=5.2.0"
     },
     "autoload": {
-        "classmap": ["Indextank"]
+        "psr-0": {"Searchify": "src/"}
     }
 }

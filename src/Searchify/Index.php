@@ -1,4 +1,9 @@
 <?php
+
+namespace Searchify;
+
+use Searchify\Api;
+
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
  * Copyright:: Copyright (c) 2011 Formspring.me
@@ -35,7 +40,7 @@ function indextank_map_range($val) {
     return sprintf("%s:%s", ($val[0] == NULL ? "*" : $val[0]), ($val[1] == NULL ? "*" : $val[1]));
 }
 
-class Indextank_Index {
+class Index {
 
     /*
     * Client for a specific index.
@@ -54,7 +59,7 @@ class Indextank_Index {
      * @param  $index_name
      * @param null $metadata
      */
-    public function __construct(Indextank_Api $api, $index_name, $metadata = NULL) {
+    public function __construct(Api $api, $index_name, $metadata = NULL) {
         $this->api = $api;
         $this->index_url = $api->index_url(str_replace('/', '', $index_name));
         $this->metadata = $metadata;
@@ -122,7 +127,7 @@ class Indextank_Index {
          * If the account has reached the limit a TooManyIndexes exception is raised
          */
         try {
-            if ( $this->exists() ) { 
+            if ( $this->exists() ) {
                 throw new Indextank_Exception_IndexAlreadyExists('An index for the given name already exists');
             }
             $res = $this->api->api_call('PUT', $this->index_url, $options);
@@ -144,7 +149,7 @@ class Indextank_Index {
         if ( ! $this->exists() ){
             throw new Indextank_Exception_IndexDoesNotExist('An index for the given name doesn\'t exist');
         }
-        
+
         $res = $this->api->api_call('PUT', $this->index_url, $options);
         return $res->status;
     }
@@ -245,7 +250,7 @@ class Indextank_Index {
     public function delete_by_search($query, $start=NULL, $scoring_function=NULL, $category_filters=NULL, $variables=NULL, $docvar_filters=NULL, $function_filters=NULL) {
 
         $params = $this->as_search_param( $query, $start, NULL, NULL, NULL, NULL, $category_filters, $variables, $docvar_filters, $function_filters);
-        
+
         try {
             $res = $this->api->api_call('DELETE', $this->search_url(), $params);
             return json_decode($res->response);
@@ -419,7 +424,7 @@ class Indextank_Index {
                 $params["filter_function" . strval($k)] = implode(array_map('indextank_map_range', $v), ",");
             }
         }
-       
+
 
         return $params;
     }
