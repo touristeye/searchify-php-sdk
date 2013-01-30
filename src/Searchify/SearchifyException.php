@@ -20,7 +20,7 @@ namespace Searchify;
  * under the License.
  */
 
-class Indextank_Exception extends Exception
+class SearchifyException extends \Exception
 {
 
 }

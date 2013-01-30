@@ -2,6 +2,8 @@
 
 namespace Searchify\Exception;
 
+use Searchify\SearchifyException;
+
 /**
  * Author:: Diego Buthay (<dbuthay@gmail.com>)
  * Copyright:: Copyright (c) 2011 indextank.com
@@ -20,7 +22,7 @@ namespace Searchify\Exception;
  * under the License.
  */
 
-class Indextank_Exception_IndexDoesNotExist extends Indextank_Exception
+class IndexDoesNotExist extends SearchifyException
 {
 
 }

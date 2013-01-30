@@ -2,6 +2,8 @@
 
 namespace Searchify\Exception;
 
+use Searchify\SearchifyException;
+
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
  * Copyright:: Copyright (c) 2011 Formspring.me
@@ -20,7 +22,7 @@ namespace Searchify\Exception;
  * under the License.
  */
 
-class Indextank_Exception_InvalidDefinition extends Indextank_Exception
+class InvalidDefinition extends SearchifyException
 {
 
 }

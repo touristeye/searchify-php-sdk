@@ -69,7 +69,7 @@ class Api
 
     /**
      * Make a call to the api
-     * @throws Indextank_Exception_HttpException
+     * @throws Exception\HttpException
      * @param string $method HTTP method
      * @param string $url URL to call
      * @param array $params query parameters or body
@@ -109,7 +109,7 @@ class Api
         if (floor($http_code / 100) == 2) {
             return new Response($http_code, $response);
         }
-        throw new Indextank_Exception_HttpException($response, $http_code);
+        throw new Exception\HttpException($response, $http_code);
     }
 
 }

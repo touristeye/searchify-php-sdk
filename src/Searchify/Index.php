@@ -2,7 +2,8 @@
 
 namespace Searchify;
 
-use Searchify\Api;
+use Searchify\Api,
+    Searchify\SearchifyException;
 
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)
@@ -36,11 +37,18 @@ use Searchify\Api;
  * @param val: an array of 2 elements.
  * @return string
  */
-function indextank_map_range($val) {
-    return sprintf("%s:%s", ($val[0] == NULL ? "*" : $val[0]), ($val[1] == NULL ? "*" : $val[1]));
-}
+
 
 class Index {
+
+    private function indextank_map_range($arrays) {
+
+        $return = array();
+        foreach ( $arrays as $val ) {
+            $return[] = sprintf("%s:%s", ($val[0] == NULL ? "*" : $val[0]), ($val[1] == NULL ? "*" : $val[1]));
+        }
+        return $return;
+    }
 
     /*
     * Client for a specific index.
@@ -74,7 +82,7 @@ class Index {
         try {
             $this->refresh_metadata();
             return true;
-        } catch (Indextank_Exception_HttpException $e) {
+        } catch (Exception\HttpException $e) {
             if ($e->getCode() == 404) {
                 return false;
             } else {
@@ -128,13 +136,13 @@ class Index {
          */
         try {
             if ( $this->exists() ) {
-                throw new Indextank_Exception_IndexAlreadyExists('An index for the given name already exists');
+                throw new Exception\IndexAlreadyExists('An index for the given name already exists');
             }
             $res = $this->api->api_call('PUT', $this->index_url, $options);
             return $res->status;
-        } catch (Indextank_Exception_HttpException $e) {
+        } catch (Exception\HttpException $e) {
             if ($e->getCode() == 409) {
-                throw new Indextank_Exception_TooManyIndexes($e->getMessage());
+                throw new Exception\TooManyIndexes($e->getMessage());
             }
             throw $e;
         }
@@ -147,7 +155,7 @@ class Index {
          * If it doesn't exist a IndexDoesNotExist exception is raised.
          */
         if ( ! $this->exists() ){
-            throw new Indextank_Exception_IndexDoesNotExist('An index for the given name doesn\'t exist');
+            throw new Exception\IndexDoesNotExist('An index for the given name doesn\'t exist');
         }
 
         $res = $this->api->api_call('PUT', $this->index_url, $options);
@@ -187,13 +195,13 @@ class Index {
             try {
                 // make sure docid is set
                 if (!array_key_exists("docid", $doc_data)) {
-                    throw new InvalidArgumentException("document $i lacks 'docid'");
+                    throw new \InvalidArgumentException("document $i lacks 'docid'");
                 }
                 $docid = $doc_data['docid'];
 
                 // make sure fields is set
                 if (!array_key_exists("fields", $doc_data)) {
-                    throw new InvalidArgumentException("document $i lacks 'fields'");
+                    throw new \InvalidArgumentException("document $i lacks 'fields'");
                 }
                 $fields = $doc_data['fields'];
 
@@ -212,8 +220,8 @@ class Index {
                 }
 
                 $data[] = $this->as_document($docid, $fields, $variables, $categories);
-            } catch (InvalidArgumentException $iae) {
-                throw new InvalidArgumentException("while processing document $i: " . $iae->getMessage());
+            } catch (\InvalidArgumentException $iae) {
+                throw new \InvalidArgumentException("while processing document $i: " . $iae->getMessage());
             }
         }
 
@@ -254,9 +262,9 @@ class Index {
         try {
             $res = $this->api->api_call('DELETE', $this->search_url(), $params);
             return json_decode($res->response);
-        } catch (HttpException $e) {
+        } catch (Exception\HttpException $e) {
             if ($e->getCode() == 400) {
-                throw new InvalidQuery($e->getMessage());
+                throw new Exception\InvalidQuery($e->getMessage());
             }
             throw $e;
         }
@@ -301,9 +309,9 @@ class Index {
         try {
             $res = $this->api->api_call('PUT', $this->function_url($function_index), array("definition" => $definition));
             return $res->status;
-        } catch (Indextank_Exception_HttpException $e) {
+        } catch (Exception\HttpException $e) {
             if ($e->getCode() == 400) {
-                throw new Indextank_Exception_InvalidDefinition($e->getMessage());
+                throw new Exception\InvalidDefinition($e->getMessage());
             }
             throw $e;
         }
@@ -332,16 +340,22 @@ class Index {
      *     Scoring function 2 must return a value between 2 and 6 OR 7 and 11 OR greater than 15 for documents matching this query.
      *
      */
-    public function search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL) {
+    public function search($query, $args=array()) {
 
-        $params = $this->as_search_param( $query, $start, $len, $scoring_function, $snippet_fields, $fetch_fields, $category_filters, $variables, $docvar_filters, $function_filters);
+        if ( !$query ) {
+            throw new Exception\InvalidQuery("Query is empty");
+        }
+
+        $args['query'] = $query;
+
+        $params = $this->as_search_param($args);
 
         try {
             $res = $this->api->api_call('GET', $this->search_url(), $params);
             return json_decode($res->response);
-        } catch (Indextank_Exception_HttpException $e) {
+        } catch (Exception\HttpException $e) {
             if ($e->getCode() == 400) {
-                throw new Indextank_Exception_InvalidQuery($e->getMessage());
+                throw new Exception\InvalidQuery($e->getMessage());
             }
             throw $e;
         }
@@ -365,8 +379,8 @@ class Index {
      * Creates a 'document', useful for IndexClient->add_document and IndexClient->add_documents
      */
     private function as_document($docid, $fields, $variables = NULL, $categories = NULL) {
-        if (NULL == $docid) throw new InvalidArgumentException("\$docid can't be NULL");
-        if (mb_strlen($docid, '8bit') > 1024) throw new InvalidArgumentException("\$docid can't be longer than 1024 bytes");
+        if (NULL == $docid) throw new \InvalidArgumentException("\$docid can't be NULL");
+        if (mb_strlen($docid, '8bit') > 1024) throw new \InvalidArgumentException("\$docid can't be longer than 1024 bytes");
         $data = array("docid" => $docid, "fields" => $fields);
         if ($variables != NULL) {
             $data["variables"] = $this->convert_to_map($variables);
@@ -378,10 +392,26 @@ class Index {
         return $data;
     }
 
+    /**
+     * Prepares the arguments
+     *
+     * @param  array $args
+     * @return array
+     */
+    private function as_search_param($args) {
 
-
-
-    private function as_search_param( $query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL) {
+        $query            = $args['query'];
+        $category_filters = isset($args['category_filters']) ? $args['category_filters'] : NULL;
+        $docvar_filters   = isset($args['docvar_filters']) ? $args['docvar_filters'] : NULL;
+        $fetch_categories = isset($args['fetch_categories']) ? $args['fetch_categories'] : NULL;
+        $fetch_fields     = isset($args['fetch_fields']) ? $args['fetch_fields'] : NULL;
+        $fetch_variables  = isset($args['fetch_variables']) ? $args['fetch_variables'] : NULL;
+        $function_filters = isset($args['function_filters']) ? $args['function_filters'] : NULL;
+        $len              = isset($args['len']) ? $args['len'] : NULL;
+        $scoring_function = isset($args['scoring_function']) ? $args['scoring_function'] : NULL;
+        $snippet_fields   = isset($args['snippet_fields']) ? $args['snippet_fields'] : NULL;
+        $start            = isset($args['start']) ? $args['start'] : NULL;
+        $variables        = isset($args['variables']) ? $args['variables'] : NULL;
 
         $params = array("q" => $query);
         if ($start != NULL) {
@@ -391,13 +421,19 @@ class Index {
             $params["len"] = $len;
         }
         if ($scoring_function != NULL) {
-            $params["function"] = (string)$scoring_function;
+            $params["function"] = (string) $scoring_function;
         }
         if ($snippet_fields != NULL) {
             $params["snippet"] = $snippet_fields;
         }
         if ($fetch_fields != NULL) {
             $params["fetch"] = $fetch_fields;
+        }
+        if ($fetch_variables != NULL) {
+            $params["fetch_variables"] = $fetch_variables;
+        }
+        if ($fetch_categories != NULL) {
+            $params["fetch_categories"] = $fetch_categories;
         }
         if ($category_filters != NULL) {
             $params["category_filters"] = json_encode($category_filters);
@@ -413,7 +449,7 @@ class Index {
             // $docvar_filters is something like
             // { 3 => [ (1, 3), (5, NULL) ]} to filter_docvar3 => 1:3,5:*
             foreach ($docvar_filters as $k => $v) {
-                $params["filter_docvar" . strval($k)] = implode(array_map('indextank_map_range', $v), ",");
+                $params["filter_docvar" . strval($k)] = implode($this->indextank_map_range($v), ",");
             }
         }
 
@@ -421,7 +457,7 @@ class Index {
             // $function_filters is something like
             // { 2 => [ (1, 4), (7, NULL) ]} to filter_function2 => 1:4,7:*
             foreach ($function_filters as $k => $v) {
-                $params["filter_function" . strval($k)] = implode(array_map('indextank_map_range', $v), ",");
+                $params["filter_function" . strval($k)] = implode($this->indextank_map_range($v), ",");
             }
         }
 
