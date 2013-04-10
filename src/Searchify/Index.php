@@ -495,7 +495,7 @@ class Index {
     }
 
     private function convert_to_map($array_object) {
-        $result = new stdClass();
+        $result = new \stdClass();
 
         for ($i = 0; $i < sizeof($array_object); ++$i) {
             $result->{$i} = $array_object[$i];
